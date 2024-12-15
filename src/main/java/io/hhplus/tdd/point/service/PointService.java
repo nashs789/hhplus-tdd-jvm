@@ -1,4 +1,4 @@
-package io.hhplus.tdd.point;
+package io.hhplus.tdd.point.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

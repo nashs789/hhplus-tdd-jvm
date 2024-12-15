@@ -1,4 +1,4 @@
-package io.hhplus.tdd.point;
+package io.hhplus.tdd.point.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

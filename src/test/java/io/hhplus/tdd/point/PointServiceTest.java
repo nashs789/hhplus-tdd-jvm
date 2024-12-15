@@ -2,7 +2,8 @@ package io.hhplus.tdd.point;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
-import org.junit.jupiter.api.Assertions;
+import io.hhplus.tdd.point.dto.PointHistory;
+import io.hhplus.tdd.point.dto.UserPoint;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +14,8 @@ import java.util.List;
 
 import static io.hhplus.tdd.point.TransactionType.CHARGE;
 import static io.hhplus.tdd.point.TransactionType.USE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
