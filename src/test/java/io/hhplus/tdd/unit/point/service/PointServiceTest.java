@@ -1,12 +1,16 @@
-package io.hhplus.tdd.point;
+package io.hhplus.tdd.unit.point.service;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
+import io.hhplus.tdd.point.SyncPointManager;
 import io.hhplus.tdd.point.dto.PointHistory;
+import io.hhplus.tdd.point.dto.PointRequest;
 import io.hhplus.tdd.point.dto.UserPoint;
+import io.hhplus.tdd.point.service.PointService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -16,6 +20,7 @@ import static io.hhplus.tdd.point.TransactionType.CHARGE;
 import static io.hhplus.tdd.point.TransactionType.USE;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +35,12 @@ class PointServiceTest {
     @Mock
     private PointHistoryTable historyTable;
 
+    @Mock
+    private SyncPointManager syncPointManager;
+
+    @InjectMocks
+    private PointService pointService;
+
     @Test
     @DisplayName("유저 포인트 조회")
     void findPointById() {
@@ -37,23 +48,7 @@ class PointServiceTest {
         when(pointTable.selectById(USER_ID)).thenReturn(new UserPoint(1L, BASE_POINT, System.currentTimeMillis()));
 
         // when
-        UserPoint userPoint = pointTable.selectById(1L);
-
-        // then
-        assertAll(
-                () -> assertEquals(USER_ID, userPoint.id()),
-                () -> assertEquals(BASE_POINT, userPoint.point())
-        );
-    }
-
-    @Test
-    @DisplayName("유저 데이터 삽입")
-    void saveUserPoint() {
-        // given
-        when(pointTable.insertOrUpdate(USER_ID, BASE_POINT)).thenReturn(new UserPoint(1L, BASE_POINT, System.currentTimeMillis()));
-
-        // when
-        UserPoint userPoint = pointTable.insertOrUpdate(USER_ID, BASE_POINT);
+        UserPoint userPoint = pointService.findPointById(USER_ID);
 
         // then
         assertAll(
@@ -73,7 +68,7 @@ class PointServiceTest {
         ));
 
         // when
-        List<PointHistory> histories = historyTable.selectAllByUserId(USER_ID);
+        List<PointHistory> histories = pointService.findAllHistories(USER_ID);
 
         // then
         assertAll(
@@ -85,13 +80,16 @@ class PointServiceTest {
 
     @Test
     @DisplayName("유저 포인터 충전")
-    void chargeUserPoint() {
+    void chargeUserPoint() throws Exception {
         // given
-        final long AFTER_CHARGE = 2000L;
-        when(pointTable.insertOrUpdate(1L, AFTER_CHARGE)).thenReturn(new UserPoint(1L, AFTER_CHARGE, System.currentTimeMillis()));
+        final long CHARGE_POINT = 1000L;
+        final long AFTER_CHARGE = BASE_POINT + CHARGE_POINT;
+        PointRequest pointRequest = new PointRequest(AFTER_CHARGE);
+
+        when(syncPointManager.runTask(any())).thenReturn(new UserPoint(USER_ID, AFTER_CHARGE, System.currentTimeMillis()));
 
         // when
-        UserPoint userPoint = pointTable.insertOrUpdate(1L, AFTER_CHARGE);
+        UserPoint userPoint = pointService.chargePoint(USER_ID, pointRequest);
 
         // then
         assertAll(
@@ -102,18 +100,21 @@ class PointServiceTest {
 
     @Test
     @DisplayName("유저 포인트 사용")
-    void useUserPoint() {
+    void useUserPoint() throws Exception {
         // given
-        final long AFTER_CHARGE = 2000L;
-        when(pointTable.insertOrUpdate(1L, AFTER_CHARGE)).thenReturn(new UserPoint(1L, AFTER_CHARGE, System.currentTimeMillis()));
+        final long USE_POINT = 500L;
+        final long AFTER_USE = BASE_POINT - USE_POINT;
+        PointRequest pointRequest = new PointRequest(AFTER_USE);
+
+        when(syncPointManager.runTask(any())).thenReturn(new UserPoint(USER_ID, AFTER_USE, System.currentTimeMillis()));
 
         // when
-        UserPoint userPoint = pointTable.insertOrUpdate(1L, AFTER_CHARGE);
+        UserPoint userPoint = pointService.usePoint(1L, pointRequest);
 
         // then
         assertAll(
                 () -> assertEquals(USER_ID, userPoint.id()),
-                () -> assertEquals(AFTER_CHARGE, userPoint.point())
+                () -> assertEquals(AFTER_USE, userPoint.point())
         );
     }
 }

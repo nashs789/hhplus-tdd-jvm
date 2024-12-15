@@ -1,15 +1,13 @@
 package io.hhplus.tdd.point.exception;
 
+import io.hhplus.tdd.global.exception.BankException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.*;
 
-@Getter
-public class PointException extends RuntimeException{
-
-    private HttpStatus status;
+public class PointException extends BankException {
 
     @Getter
     @RequiredArgsConstructor
@@ -23,7 +21,6 @@ public class PointException extends RuntimeException{
     }
 
     public PointException(PointError pointError) {
-        super(pointError.getMsg());
-        this.status = pointError.getStatus();
+        super(pointError.getMsg(), pointError.getStatus());
     }
 }

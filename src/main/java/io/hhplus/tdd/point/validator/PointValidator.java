@@ -1,11 +1,9 @@
 package io.hhplus.tdd.point.validator;
 
 import io.hhplus.tdd.point.exception.PointException;
-import org.springframework.stereotype.Component;
 
 import static io.hhplus.tdd.point.exception.PointException.PointError.*;
 
-@Component
 public class PointValidator {
 
     private PointValidator(){}
