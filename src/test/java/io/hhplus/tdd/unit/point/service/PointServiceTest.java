@@ -2,7 +2,7 @@ package io.hhplus.tdd.unit.point.service;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
-import io.hhplus.tdd.point.SyncPointManager;
+import io.hhplus.tdd.point.component.SyncPointManager;
 import io.hhplus.tdd.point.dto.PointHistory;
 import io.hhplus.tdd.point.dto.PointRequest;
 import io.hhplus.tdd.point.dto.UserPoint;
@@ -86,7 +86,7 @@ class PointServiceTest {
         final long AFTER_CHARGE = BASE_POINT + CHARGE_POINT;
         PointRequest pointRequest = new PointRequest(AFTER_CHARGE);
 
-        when(syncPointManager.runTask(any())).thenReturn(new UserPoint(USER_ID, AFTER_CHARGE, System.currentTimeMillis()));
+        when(syncPointManager.changePoint(any(), any())).thenReturn(new UserPoint(USER_ID, AFTER_CHARGE, System.currentTimeMillis()));
 
         // when
         UserPoint userPoint = pointService.chargePoint(USER_ID, pointRequest);
@@ -106,7 +106,7 @@ class PointServiceTest {
         final long AFTER_USE = BASE_POINT - USE_POINT;
         PointRequest pointRequest = new PointRequest(AFTER_USE);
 
-        when(syncPointManager.runTask(any())).thenReturn(new UserPoint(USER_ID, AFTER_USE, System.currentTimeMillis()));
+        when(syncPointManager.changePoint(any(), any())).thenReturn(new UserPoint(USER_ID, AFTER_USE, System.currentTimeMillis()));
 
         // when
         UserPoint userPoint = pointService.usePoint(1L, pointRequest);

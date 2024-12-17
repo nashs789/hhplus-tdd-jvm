@@ -1,10 +1,11 @@
 package io.hhplus.tdd.integration.point;
 
-import io.hhplus.tdd.point.SyncPointManager;
+import io.hhplus.tdd.point.component.PointManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -14,13 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest
-class SyncPointManagerTest {
+//@ActiveProfiles("sync")
+//@ActiveProfiles("lock")
+@ActiveProfiles("exec")
+class PointManagerTest {
 
     @Autowired
-    private SyncPointManager syncPointManager;
+    private PointManager pointManager;
 
     @Test
-    @DisplayName("순차적으로 실행하지 않은 테스트(비교용)")
+    @DisplayName("Race Condition 으로 원치 않는 결과를 만드는 테스트 (비교용)")
     void notRunSequentialExecution() throws InterruptedException {
         // given
         final int CHARGE_POINT = 100;
@@ -49,8 +53,8 @@ class SyncPointManagerTest {
     }
 
     @Test
-    @DisplayName("순차적 실행 보장 synchronized 테스트")
-    void runSequentialExecutionBySynchronized() throws Exception {
+    @DisplayName("유저 순차적 실행 보장 테스트")
+    void pointTestForSingleUser() throws Exception {
         // given
         final int CHARGE_POINT = 100;
         final int JOB_COUNT = 20;
@@ -62,7 +66,7 @@ class SyncPointManagerTest {
         for(int currentJob = 0; currentJob < JOB_COUNT; currentJob++) {
             executor.submit(() -> {
                 try {
-                    syncPointManager.runTask(() -> {
+                    pointManager.changePoint(1L, () -> {
                         int gotAmount = amount[0];
                         Thread.sleep(200);
                         latch.countDown();

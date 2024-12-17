@@ -2,7 +2,7 @@ package io.hhplus.tdd.point.service;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
-import io.hhplus.tdd.point.SyncPointManager;
+import io.hhplus.tdd.point.component.PointManager;
 import io.hhplus.tdd.point.dto.PointHistory;
 import io.hhplus.tdd.point.dto.PointRequest;
 import io.hhplus.tdd.point.dto.UserPoint;
@@ -26,8 +26,8 @@ public class PointService {
     private final UserPointTable pointTable;
     /** 유저 포인트 이력 */
     private final PointHistoryTable historyTable;
-
-    private final SyncPointManager syncPointManager;
+    /** 유저 포인트 조작 매니저 */
+    private final PointManager pointManager;
 
     public UserPoint findPointById(final long id) {
         UserValidator.validateUser(id);
@@ -42,7 +42,7 @@ public class PointService {
     }
 
     public UserPoint chargePoint(final long id, final PointRequest pointRequest) throws Exception {
-        return syncPointManager.runTask(() -> {
+        return pointManager.changePoint(id, () -> {
             UserValidator.validateUser(id);
 
             UserPoint userPoint = pointTable.selectById(id);
@@ -57,7 +57,7 @@ public class PointService {
     }
 
     public UserPoint usePoint(final long id, final PointRequest pointRequest) throws Exception {
-        return syncPointManager.runTask(() -> {
+        return pointManager.changePoint(id, () -> {
             UserValidator.validateUser(id);
 
             UserPoint userPoint = pointTable.selectById(id);
@@ -70,30 +70,4 @@ public class PointService {
             return pointTable.insertOrUpdate(id, afterPoint);
         });
     }
-
-//    public UserPoint chargePoint(final long id, final PointRequest pointRequest) {
-//        UserValidator.validateUser(id);
-//
-//        UserPoint userPoint = pointTable.selectById(id);
-//        long afterPoint = userPoint.point() + pointRequest.amount();
-//
-//        PointValidator.validatePoint(userPoint.point(), afterPoint);
-//
-//        historyTable.insert(id, afterPoint, CHARGE, pointRequest.reqTime());
-//
-//        return pointTable.insertOrUpdate(id, afterPoint);
-//    }
-//
-//    public UserPoint usePoint(final long id, final PointRequest pointRequest) {
-//        UserValidator.validateUser(id);
-//
-//        UserPoint userPoint = pointTable.selectById(id);
-//        long afterPoint = userPoint.point() - pointRequest.amount();
-//
-//        PointValidator.validatePoint(userPoint.point(), afterPoint);
-//
-//        historyTable.insert(id, afterPoint, USE, pointRequest.reqTime());
-//
-//        return pointTable.insertOrUpdate(id, afterPoint);
-//    }
 }
