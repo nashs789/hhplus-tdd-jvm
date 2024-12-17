@@ -1,5 +1,7 @@
 package io.hhplus.tdd;
 
+import io.hhplus.tdd.global.exception.BankException;
+import io.hhplus.tdd.point.exception.PointException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -9,6 +11,17 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 class ApiControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        return ResponseEntity.status(500).body(new ErrorResponse("500", "에러가 발생했습니다."));
+        return ResponseEntity.status(500)
+                             .body(new ErrorResponse("500", "에러가 발생했습니다."));
+    }
+
+    @ExceptionHandler(value = BankException.class)
+    public ResponseEntity<ErrorResponse> handleException(BankException be) {
+        return ResponseEntity.status(be.getStatus())
+                             .body(new ErrorResponse(
+                                     Integer.toString(be.getStatus().value()),
+                                     be.getMessage()
+                                   )
+                             );
     }
 }
