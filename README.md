@@ -60,7 +60,9 @@ void notRunSequentialExecution() throws InterruptedException {
 Race Condition 을 유발하기 위해서 작성한 테스트 코드이다.   
 amount[0] 에 100 원씩 충전을 20번 하는 코드 이지만 실제로 결과는 다르게 2,000 이 아닌 값이 나온다.
 
---- 결과 사진 ---
+<img width="629" alt="스크린샷 2024-12-19 오후 2 33 52" src="https://github.com/user-attachments/assets/8ed8df44-a1b0-4eaa-ae19-9e23d4641fb0" />
+<img width="629" alt="스크린샷 2024-12-19 오후 2 33 25" src="https://github.com/user-attachments/assets/cc32603d-2252-4dfe-933f-55debfdde0f0" />
+<img width="629" alt="스크린샷 2024-12-19 오후 2 34 30" src="https://github.com/user-attachments/assets/96d00307-3e2f-40ec-9383-b3fc01db6057" />
 
 #### 🤔 왜 매번 실행마다 상이한 값이 나올까?
 
